@@ -1,15 +1,15 @@
 <template>
     <div class="container">
-        <h1>App</h1><br>
-
-        <router-link :to="{ name: 'home'} ">Home</router-link>
-        <router-link :to="{ name: 'login'} ">Login</router-link>
-        <router-link :to="{ name: 'dashboard'} ">Dashboard</router-link>
-        <router-view></router-view>
+        Spa componrnt
+        <navigation/>
     </div>
 
 </template>
 
 <script>
-export default {}
+import Navigation from "./components/Navigation.vue";
+
+export default {
+    components: {Navigation}
+}
 </script>
