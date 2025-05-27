@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        Spa componrnt
+        Spa component
         <navigation/>
     </div>
 
