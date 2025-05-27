@@ -32,7 +32,7 @@ Route::post('/login', function (Request $request) {
     }
 
     throw ValidationException::withMessages([
-        'email' => ['The provided credentials are incorrect.'],
+        'error' => ['The provided credentials are incorrect.'],
     ]);
 });
 
@@ -41,10 +41,6 @@ Route::post('/logout', function (Request $request) {
 
     $request->session()->invalidate();
     $request->session()->regenerateToken();
-
-    return response()->json([
-        'message' => 'Logout successful'
-    ]);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
