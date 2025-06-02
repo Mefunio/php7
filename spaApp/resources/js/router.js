@@ -3,6 +3,8 @@ import VueRouter from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import Dashboard from './views/Dashboard.vue';
+import { Auth } from "./api/Auth";
+
 Vue.use(VueRouter);
 const router = new VueRouter({
     mode: 'history'
@@ -17,7 +19,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        if (!isLogged()) {
+        if (!Auth.isLogged()) {
             next({
                 path: '/login',
                 query: { redirect: to.fullPath }
@@ -26,7 +28,7 @@ router.beforeEach((to, from, next) => {
             next();
         }
     } else if (to.matched.some(record => record.meta.guestOnly)) {
-        if (isLogged()) {
+        if (Auth.isLogged()) {
             next({
                 path: '/dashboard',
                 query: {redirect: to.fullPath}
@@ -40,8 +42,4 @@ router.beforeEach((to, from, next) => {
         next();
     }
 });
-
-function isLogged() {
-    return localStorage.getItem("isLogged");
-}
 export default router;

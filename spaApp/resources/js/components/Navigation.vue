@@ -11,13 +11,17 @@
 </template>
 
 <script>
+    import Error from "./Error.vue";
     export default {
+        components: { Error },
+        inject: ["eventBus", "auth"],
         data() {
             return { isLogged: null };
         },
         created() {
             this.isLogged = localStorage.getItem("isLogged");
             this.$root.$on("isLogged", (status) => {
+                console.log(status)
                 this.isLogged = status;
             });
         },
@@ -27,16 +31,9 @@
     methods: {
         async logout() {
             try {
-            await axios.post("/api/logout");
-            localStorage.removeItem("isLogged");
-            this.isLogged = null;
-            if (this.$route.name !== "home") {
-                await this.$router.push({name: "home"});
-            }
-            } catch (err) {
-                console.error("Logout failed:", err);
-            }
+                await this.auth.logout();
+            } catch (err) { }
         }
-        }
+    }
     }
 </script>

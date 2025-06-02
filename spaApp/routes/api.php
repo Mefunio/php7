@@ -23,8 +23,6 @@ Route::post('/login', function (Request $request) {
     ]);
 
     if (Auth::attempt($request->only('email', 'password'))) {
-        $request->session()->regenerate();
-
         return response()->json([
             'message' => 'Login successful',
             'user' => Auth::user()

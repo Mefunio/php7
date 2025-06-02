@@ -7,22 +7,19 @@
 
 <script>
 export default {
+    inject: ["auth"],
     data() {
         return {
             user: null,
         };
     },
     created() {
-        this.fetchUser();
+        this.getAuthUser();
     },
     methods: {
-        async fetchUser() {
-            try {
-                const response = await axios.get("/api/user");
-                this.user = response.data.name;
-            } catch (error) {
-                console.error("Failed to fetch user:", error);
-            }
+        async getAuthUser() {
+            let user = await this.auth.getAuthUser();
+            this.user = user.data.name;
         },
     },
 }
