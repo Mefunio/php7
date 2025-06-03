@@ -1999,25 +1999,19 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
   inject: ["eventBus", "auth"],
   data: function data() {
     return {
-      isLogged: null,
-      user: null
+      isLogged: null
     };
   },
   created: function created() {
     var _this = this;
     this.isLogged = localStorage.getItem("isLogged");
-    this.$root.$on("isLogged", function (status) {
+    this.eventBus.$on("isLogged", function (status) {
       console.log(status);
       _this.isLogged = status;
     });
-    this.$root.$on("userChanged", function (user) {
-      _this.user = user;
-      _this.isLogged = !!user;
-    });
   },
   beforeDestroy: function beforeDestroy() {
-    this.$root.$off("isLogged");
-    this.$root.$off("userChanged");
+    this.eventBus.$off("isLogged");
   },
   methods: {
     logout: function logout() {
@@ -53122,7 +53116,6 @@ var Auth = /*#__PURE__*/function () {
     key: "login",
     value: function () {
       var _login = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(form) {
-        var user;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -53133,17 +53126,11 @@ var Auth = /*#__PURE__*/function () {
               return this.httpRequest.send("POST", "/api/login", form);
             case 4:
               localStorage.setItem("isLogged", "true");
-              // Fetch user and emit event
-              _context.next = 7;
-              return this.getAuthUser();
-            case 7:
-              user = _context.sent;
-              this.eventBus.$emit('userChanged', user);
               this.eventBus.$emit('isLogged', true);
               this.router.push({
                 name: 'dashboard'
               });
-            case 11:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -53163,17 +53150,15 @@ var Auth = /*#__PURE__*/function () {
             case 0:
               localStorage.removeItem("isLogged");
               this.eventBus.$emit('isLogged', false);
-              // Emit userChanged with null
-              this.eventBus.$emit('userChanged', null);
-              _context2.next = 5;
+              _context2.next = 4;
               return this.httpRequest.send("POST", "/api/logout");
-            case 5:
+            case 4:
               if (this.router.currentRoute.name !== 'home') {
                 this.router.push({
                   name: 'home'
                 });
               }
-            case 6:
+            case 5:
             case "end":
               return _context2.stop();
           }

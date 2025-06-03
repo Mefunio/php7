@@ -11,23 +11,23 @@
 </template>
 
 <script>
-    import Error from "./Error.vue";
-    export default {
-        components: { Error },
-        inject: ["eventBus", "auth"],
-        data() {
-            return { isLogged: null };
-        },
-        created() {
-            this.isLogged = localStorage.getItem("isLogged");
-            this.$root.$on("isLogged", (status) => {
-                console.log(status)
-                this.isLogged = status;
-            });
-        },
-        beforeDestroy() {
-            this.$root.$off("isLogged");
-        },
+import Error from "./Error.vue";
+export default {
+    components: { Error },
+    inject: ["eventBus", "auth"],
+    data() {
+        return { isLogged: null };
+    },
+    created() {
+        this.isLogged = localStorage.getItem("isLogged");
+        this.eventBus.$on("isLogged", (status) => {
+            console.log(status)
+            this.isLogged = status;
+        });
+    },
+    beforeDestroy() {
+        this.eventBus.$off("isLogged");
+    },
     methods: {
         async logout() {
             try {
@@ -35,5 +35,5 @@
             } catch (err) { }
         }
     }
-    }
+}
 </script>
