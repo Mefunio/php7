@@ -45,4 +45,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource('students', 'StudentController');
+Route::get('students', 'StudentController@index');
+Route::get('students/{student}', 'StudentController@show');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('students', 'StudentController@store');
+    Route::put('students/{student}', 'StudentController@update');
+    Route::delete('students/{student}', 'StudentController@destroy');
+});

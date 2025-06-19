@@ -1,3 +1,5 @@
+import {StudentsRepository} from "./api/StudentsRepository";
+
 require('./bootstrap');
 import Spa from './Spa.vue';
 import router from './router.js';
@@ -16,7 +18,8 @@ const app = new Vue({
     provide() {
         return {
             eventBus: this.eventBus,
-            auth: new Auth(this.eventBus, router)
+            auth: new Auth(this.eventBus, router),
+            studentsRepository: new StudentsRepository(this.eventBus)
         };
     }
 });

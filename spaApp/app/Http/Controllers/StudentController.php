@@ -3,61 +3,69 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Student;
+use App\Http\Resources\StudentResource;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except(['index', 'show']);
+    }
+
     public function index()
     {
-        //
+        $students = Student::all();
+        return StudentResource::collection($students);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'index' => 'regex:/^s[0-9][0-9][0-9]$/ | unique:students',
+            'email' => 'required|email|unique:students',
+            'age' => 'required|integer|min:18|max:100',
+            'description' => 'nullable|string',
+            'paid' => 'boolean'
+        ]);
+
+        $student = Student::create($validatedData);
+
+        return new StudentResource($student);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function show(Student $student)
     {
-        //
+        return new StudentResource($student);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function update(Request $request, Student $student)
     {
-        //
+        $validatedData = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'index' => "regex:/^s[0-9][0-9][0-9]$/ | unique:students,index,$student->id",
+            'email' => "required|email|unique:students,email,$student->id",
+            'age' => 'required|integer|min:18|max:100',
+            'description' => 'nullable|string',
+            'paid' => 'boolean'
+        ]);
+
+        $student->update($validatedData);
+
+        return new StudentResource($student);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function destroy(Student $student)
     {
-        //
+        $student->delete();
+
+        return response()->json([
+            'message' => 'Student deleted successfully'
+        ], 204);
     }
 }
+
+
