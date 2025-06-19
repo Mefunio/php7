@@ -1,47 +1,53 @@
 <template>
-    <div class="container">
-        <h1>Dashboard</h1>
-        <div v-if="user">Zalogowany użytkownik: {{ user }}</div>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="h3 mb-1">Dashboard</h1>
+                        <p class="text-muted mb-0" v-if="user">
+                            Witaj, <strong>{{ user }}</strong>
+                        </p>
+                    </div>
+                </div>
 
-        <hr>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                        <div class="btn-toolbar justify-content-between" role="toolbar">
+                            <div class="btn-group" role="group">
+                                <button
+                                    @click="selectedComponent = 'list'"
+                                    :class="['btn', selectedComponent === 'list' ? 'btn-primary' : 'btn-outline-primary']"
+                                >
+                                    Lista studentów
+                                </button>
+                                <button
+                                    @click="showAddForm"
+                                    :class="['btn', selectedComponent === 'form' ? 'btn-success' : 'btn-outline-success']"
+                                >
+                                    Dodaj studenta
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Przyciski nawigacji -->
-        <div class="mb-4">
-            <div class="btn-group" role="group">
-                <button
-                    @click="selectedComponent = 'list'"
-                    :class="['btn', selectedComponent === 'list' ? 'btn-primary' : 'btn-outline-primary']"
-                >
-                    Lista studentów
-                </button>
-                <button
-                    @click="showAddForm"
-                    :class="['btn', selectedComponent === 'form' ? 'btn-success' : 'btn-outline-success']"
-                >
-                    Dodaj studenta
-                </button>
+                <student-list
+                    v-if="selectedComponent === 'list'"
+                    :students="students"
+                    @add-student="showAddForm"
+                    @edit-student="showEditForm"
+                    @student-deleted="handleStudentDeleted"
+                />
+
+                <student-form
+                    v-if="selectedComponent === 'form'"
+                    :student="selectedStudent"
+                    @created="handleStudentCreated"
+                    @updated="handleStudentUpdated"
+                    @cancelled="showList"
+                />
             </div>
-        </div>
-
-        <!-- Dynamiczne ładowanie komponentów -->
-        <div class="mt-4">
-            <!-- Lista studentów -->
-            <student-list
-                v-if="selectedComponent === 'list'"
-                :students="students"
-                @add-student="showAddForm"
-                @edit-student="showEditForm"
-                @student-deleted="handleStudentDeleted"
-            />
-
-            <!-- Formularz studenta -->
-            <student-form
-                v-if="selectedComponent === 'form'"
-                :student="selectedStudent"
-                @created="handleStudentCreated"
-                @updated="handleStudentUpdated"
-                @cancelled="showList"
-            />
         </div>
     </div>
 </template>
@@ -121,10 +127,12 @@ export default {
 
 <style scoped>
 .btn-group .btn {
-    margin-right: 1px;
+    font-weight: 500;
+    padding: 10px 16px;
 }
 
-hr {
-    margin: 1.5rem 0;
+.card {
+    border: none;
+    border-radius: 12px;
 }
 </style>

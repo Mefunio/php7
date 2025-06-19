@@ -1,10 +1,11 @@
 <template>
-    <div class="container">
-        Spa component
+    <div class="spa-container">
         <navigation/>
+        <main class="main-content">
+            <router-view/>
+        </main>
         <error/>
     </div>
-
 </template>
 
 <script>
@@ -27,3 +28,14 @@ export default {
     components: {Error, Navigation}
 }
 </script>
+
+<style scoped>
+.spa-container {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.main-content {
+    padding: 20px 0;
+}
+</style>

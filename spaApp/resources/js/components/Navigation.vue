@@ -1,19 +1,51 @@
 <template>
-    <div class="container">
-        <h1>Navigation</h1><br>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container">
+            <h4 class="navbar-brand mb-0">Student Manager</h4>
 
-        <router-link :to="{ name: 'home'} ">Home</router-link>
-        <router-link v-if="!isLogged" :to="{ name: 'login'} ">Login</router-link>
-        <a v-if="isLogged" @click.prevent="logout" href="#">Logout</a>
-        <router-link v-if="isLogged" :to="{ name: 'dashboard'} ">Dashboard</router-link>
-        <router-view></router-view>
-    </div>
+            <div class="navbar-nav ms-auto">
+                <router-link
+                    :to="{ name: 'home'}"
+                    class="nav-link"
+                    active-class="active"
+                    exact
+                >
+                    Home
+                </router-link>
+
+                <router-link
+                    v-if="!isLogged"
+                    :to="{ name: 'login'}"
+                    class="nav-link"
+                    active-class="active"
+                >
+                    Login
+                </router-link>
+
+                <router-link
+                    v-if="isLogged"
+                    :to="{ name: 'dashboard'}"
+                    class="nav-link"
+                    active-class="active"
+                >
+                    Dashboard
+                </router-link>
+
+                <a
+                    v-if="isLogged"
+                    @click.prevent="logout"
+                    href="#"
+                    class="nav-link logout-link"
+                >
+                    Logout
+                </a>
+            </div>
+        </div>
+    </nav>
 </template>
 
 <script>
-import Error from "./Error.vue";
 export default {
-    components: { Error },
     inject: ["eventBus", "auth"],
     data() {
         return { isLogged: null };
@@ -21,7 +53,6 @@ export default {
     created() {
         this.isLogged = localStorage.getItem("isLogged");
         this.eventBus.$on("isLogged", (status) => {
-            console.log(status)
             this.isLogged = status;
         });
     },
@@ -37,3 +68,30 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.navbar-brand {
+    font-weight: 600;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 6px;
+    margin: 0 2px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-link:hover {
+    color: white !important;
+    background-color: #ff6b6b;
+    border-color: #ff6b6b !important;
+}
+</style>

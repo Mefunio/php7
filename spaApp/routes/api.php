@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('students', 'StudentController@index');
 Route::get('students/{student}', 'StudentController@show');
+Route::get('student-statistics', 'StudentController@statistics');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('students', 'StudentController@store');

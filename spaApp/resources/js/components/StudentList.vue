@@ -1,57 +1,90 @@
 <template>
-    <div class="container">
-        <h2>Lista studentów</h2>
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h4 class="card-title mb-0">Lista studentów</h4>
 
-        <div v-if="students.length > 0" class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Imię</th>
-                    <th>Nazwisko</th>
-                    <th>Indeks</th>
-                    <th>Email</th>
-                    <th>Wiek</th>
-                    <th>Opis</th>
-                    <th>Opłacone</th>
-                    <th>Akcje</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="student in students" :key="student.id">
-                    <td>{{ student.id }}</td>
-                    <td>{{ student.first_name }}</td>
-                    <td>{{ student.last_name }}</td>
-                    <td>{{ student.index }}</td>
-                    <td>{{ student.email }}</td>
-                    <td>{{ student.age }}</td>
-                    <td>{{ student.description || '' }}</td>
-                    <td>
-                            <span :class="student.paid ? 'badge bg-success' : 'badge bg-danger'">
-                                {{ student.paid ? 'Tak' : 'Nie' }}
+            <div class="mt-3">
+                <div class="input-group w-50">
+                    <input
+                        type="text"
+                        v-model="searchFilter"
+                        class="form-control"
+                        placeholder="Wyszukaj po imieniu, nazwisku lub numerze indeksu..."
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-0">
+            <div v-if="filteredStudents.length > 0" class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                    <tr>
+                        <th class="border-0 fw-semibold">ID</th>
+                        <th class="border-0 fw-semibold">Imię</th>
+                        <th class="border-0 fw-semibold">Nazwisko</th>
+                        <th class="border-0 fw-semibold">Indeks</th>
+                        <th class="border-0 fw-semibold">Email</th>
+                        <th class="border-0 fw-semibold">Wiek</th>
+                        <th class="border-0 fw-semibold">Opis</th>
+                        <th class="border-0 fw-semibold">Status</th>
+                        <th class="border-0 fw-semibold text-center">Akcje</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="student in filteredStudents" :key="student.id" class="align-middle">
+                        <td class="text-muted">{{ student.id }}</td>
+                        <td class="fw-medium">{{ student.first_name }}</td>
+                        <td class="fw-medium">{{ student.last_name }}</td>
+                        <td>
+                            <code class="text-primary">{{ student.index }}</code>
+                        </td>
+                        <td>
+                            <a :href="'mailto:' + student.email" class="text-decoration-none">
+                                {{ student.email }}
+                            </a>
+                        </td>
+                        <td>{{ student.age }} lat</td>
+                        <td>
+                            <span v-if="student.description" class="text-muted">
+                                {{ student.description.substring(0, 10) }}
+                                <span v-if="student.description.length > 10">...</span>
                             </span>
-                    </td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button
-                                @click="$emit('edit-student', student)"
-                                class="btn btn-sm btn-warning"
-                                title="Edytuj"
-                            >
-                                Edytuj
-                            </button>
-                            <button
-                                @click="deleteStudent(student.id)"
-                                class="btn btn-sm btn-danger"
-                                title="Usuń"
-                            >
-                                Usuń
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                            <span v-else class="text-muted fst-italic">Brak opisu</span>
+                        </td>
+                        <td>
+                            <span :class="student.paid ? 'badge bg-success' : 'badge bg-warning text-dark'">
+                                {{ student.paid ? '✓ Opłacono' : '⏳ Oczekuje na płatność' }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button
+                                    @click="$emit('edit-student', student)"
+                                    class="btn btn-outline-primary"
+                                    title="Edytuj"
+                                >
+                                    Edytuj
+                                </button>
+                                <button
+                                    @click="deleteStudent(student.id)"
+                                    class="btn btn-outline-danger"
+                                    title="Usuń"
+                                >
+                                    Usuń
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div v-else class="text-center py-5">
+                <div class="text-muted">
+                    <h5>Brak studentów</h5>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -63,6 +96,29 @@ export default {
         students: {
             type: Array,
             required: true
+        }
+    },
+    data() {
+        return {
+            searchFilter: ''
+        }
+    },
+    computed: {
+        filteredStudents() {
+            if (!this.searchFilter) {
+                return this.students;
+            }
+
+            const searchTerm = this.searchFilter.toLowerCase().trim();
+
+            return this.students.filter(student => {
+                return student.first_name.toLowerCase().includes(searchTerm) ||
+                       student.last_name.toLowerCase().includes(searchTerm) ||
+                       student.index.toString().includes(searchTerm);
+            });
+        },
+        isFiltering() {
+            return this.searchFilter.length > 0;
         }
     },
     methods: {
@@ -81,15 +137,37 @@ export default {
 </script>
 
 <style scoped>
+.table td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
 .table th {
-    font-weight: 600;
+    padding: 1rem 0.75rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.btn-group .btn {
-    margin-right: 2px;
+.btn-group-sm .btn {
+    padding: 0.375rem 0.75rem;
 }
 
-.badge {
-    font-size: 0.8em;
+.card {
+    border: none;
+    border-radius: 12px;
+}
+
+.card-header {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1.5rem;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+code {
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
 }
 </style>

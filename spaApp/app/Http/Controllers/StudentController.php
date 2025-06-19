@@ -10,7 +10,7 @@ class StudentController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show', 'statistics']);
     }
 
     public function index()
@@ -24,7 +24,7 @@ class StudentController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'index' => 'regex:/^s[0-9][0-9][0-9]$/ | unique:students',
+            'index' => 'regex:/^s[0-9][0-9][0-9]$/|unique:students',
             'email' => 'required|email|unique:students',
             'age' => 'required|integer|min:18|max:100',
             'description' => 'nullable|string',
@@ -46,7 +46,7 @@ class StudentController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'index' => "regex:/^s[0-9][0-9][0-9]$/ | unique:students,index,$student->id",
+            'index' => "regex:/^s[0-9][0-9][0-9]$/|unique:students,index,$student->id",
             'email' => "required|email|unique:students,email,$student->id",
             'age' => 'required|integer|min:18|max:100',
             'description' => 'nullable|string',
@@ -62,10 +62,19 @@ class StudentController extends Controller
     {
         $student->delete();
 
+        return response()->json(null, 204);
+    }
+
+    public function statistics()
+    {
+        $totalStudents = Student::count();
+        $paidStudents = Student::where('paid', true)->count();
+        $unpaidStudents = $totalStudents - $paidStudents;
+
         return response()->json([
-            'message' => 'Student deleted successfully'
-        ], 204);
+            'total' => $totalStudents,
+            'paid' => $paidStudents,
+            'unpaid' => $unpaidStudents
+        ]);
     }
 }
-
-
